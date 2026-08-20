@@ -1,0 +1,261 @@
+/*
+ * Flattened from OklchColorAtom.module.css + the `composes` chains it pulled
+ * in from global.module.css and Button.module.css. Class names dropped their
+ * CSS-module hashing (Shadow DOM already prevents collisions with the host
+ * page) and were renamed to kebab-case. `--frsted--*` design tokens became
+ * `--frcp-*`, with fallback defaults declared on :host so the component
+ * looks right even if the host page never defines them.
+ */
+
+:host {
+	display: inline-flex;
+	position: relative;
+	align-items: stretch;
+	justify-content: stretch;
+	--frcp-border: 1px solid #26232a;
+	--frcp-border-radius: 4px;
+	--frcp-color: #26232a;
+	--frcp-background: white;
+}
+
+/* Shared bordered-field look, ported from global.module.css's `.box`. */
+.field {
+	border: var(--frcp-border);
+	border-radius: var(--frcp-border-radius);
+	padding: 4px 12px;
+	height: 34px;
+	box-sizing: border-box;
+	appearance: none;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	color: var(--frcp-color);
+	background: var(--frcp-background);
+}
+
+/*
+ * Shared icon-button look, ported from Button.module.css's
+ * `.buttonIcon`+`.basic`+`.text` combination (both the close and accept
+ * buttons render with `icon` set, which always implies `variant="text"`).
+ * The source's close button additionally zeroed its border (`border: 0`)
+ * while the accept button kept an invisible 1px transparent border from the
+ * same base -- a zero-visible-difference detail, so both share one class.
+ */
+.icon-btn {
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--frcp-border-radius);
+	appearance: none;
+	cursor: pointer;
+	background: transparent;
+	color: var(--frcp-color);
+	font-family: inherit;
+	font-size: 17px;
+	display: inline-grid;
+	place-items: center;
+	line-height: 1;
+}
+.icon-btn:focus-visible,
+.icon-btn:not([disabled]):hover {
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.swatch {
+	width: 32px;
+	height: 32px;
+	box-sizing: content-box;
+	border: var(--frcp-border);
+	border-radius: 6px;
+	padding: 0;
+	overflow: hidden;
+	background: conic-gradient(
+			white 90deg,
+			transparent 90deg 180deg,
+			white 180deg 270deg,
+			transparent 270deg
+		)
+		black;
+	background-size: 10px 10px;
+	background-position: center;
+}
+
+.swatch-fill {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.popover:open {
+	position: absolute;
+	left: 0;
+	z-index: 100;
+	width: 316px;
+	padding: 14px;
+	border: var(--frcp-border);
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 10px 30px #00000024;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 0;
+}
+
+.head {
+	display: flex;
+	align-items: center;
+}
+
+.head-text {
+	font-size: 16px;
+	font-weight: 600;
+	flex: 1;
+	margin-left: 10px;
+}
+
+.plane {
+	position: relative;
+	height: 200px;
+	border: var(--frcp-border);
+	border-radius: 8px;
+	overflow: hidden;
+	background: conic-gradient(
+		#00000010 90deg,
+		transparent 90deg 180deg,
+		#00000010 180deg 270deg,
+		transparent 270deg
+	);
+	background-size: 10px 10px;
+	cursor: crosshair;
+	touch-action: none;
+}
+
+/* Dead in the source too (aria-disabled is never actually set) -- kept for parity, see planeField.ts. */
+.plane[aria-disabled="true"] {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.plane-canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	pointer-events: none;
+	image-rendering: pixelated;
+}
+
+.plane-marker {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	border: 2px solid #ffffff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 2px #26232a;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.row[hidden] {
+	display: none;
+}
+
+.row-label {
+	width: 64px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #6b6770;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.value-row {
+	border-top: 1px dashed #d6d1da;
+	padding-top: 10px;
+}
+
+.row-input {
+	flex: 1;
+	min-width: 0;
+}
+
+.track-wrap {
+	position: relative;
+	overflow: hidden;
+	background: conic-gradient(
+		#00000010 90deg,
+		transparent 90deg 180deg,
+		#00000010 180deg 270deg,
+		transparent 270deg
+	);
+	background-size: 10px 10px;
+}
+
+.canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	pointer-events: none;
+}
+
+.num {
+	padding: 4px;
+	width: 76px;
+}
+
+.slider {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	appearance: none;
+	background: transparent;
+	cursor: ew-resize;
+}
+.slider:focus {
+	background: none;
+}
+.slider::-webkit-slider-runnable-track {
+	height: 100%;
+	background: transparent;
+	border: 0;
+}
+.slider::-webkit-slider-thumb {
+	appearance: none;
+	width: 8px;
+	height: calc(100% + 6px);
+	margin-top: -3px;
+	border: 2px solid #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 0 0 2px #26232a;
+	background: transparent;
+}
+.slider::-moz-range-track {
+	height: 100%;
+	background: transparent;
+	border: 0;
+}
+.slider::-moz-range-thumb {
+	width: 8px;
+	height: calc(100% + 6px);
+	border: 2px solid #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 0 0 2px #26232a;
+	background: transparent;
+}
+
+.form {
+	display: contents;
+}

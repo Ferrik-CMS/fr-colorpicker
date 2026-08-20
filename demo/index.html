@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>fr-colorpicker demo</title>
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				max-width: 900px;
+				margin: 40px auto;
+				padding: 0 16px;
+				color: #1a1a1a;
+			}
+			section {
+				margin-bottom: 32px;
+				padding-bottom: 24px;
+				border-bottom: 1px solid #ddd;
+			}
+			h2 {
+				font-size: 16px;
+			}
+			p {
+				color: #555;
+				font-size: 14px;
+			}
+			.row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			#log {
+				background: #111;
+				color: #0f0;
+				padding: 12px;
+				border-radius: 6px;
+				max-height: 220px;
+				overflow-y: auto;
+				font-size: 12px;
+				white-space: pre-wrap;
+			}
+			/* Theming demo: override the design tokens fr-colorpicker falls back to. */
+			.themed {
+				--frcp-border: 2px solid #7c3aed;
+				--frcp-border-radius: 10px;
+				--frcp-color: #4c1d95;
+				--frcp-background: #f5f3ff;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>fr-colorpicker demo</h1>
+		<p>Manual visual test harness -- see the plan/README for the full checklist this page is meant to exercise.</p>
+
+		<section>
+			<h2>Default</h2>
+			<fr-colorpicker id="c-default" name="default-color" value="oklch(0.6 0.15 250)"></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>no-alpha</h2>
+			<fr-colorpicker id="c-no-alpha" no-alpha value="#7a4fb5"></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>color-space="srgb"</h2>
+			<fr-colorpicker id="c-srgb" color-space="srgb" value="oklch(0.55 0.2 20)"></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>disabled</h2>
+			<fr-colorpicker id="c-disabled" disabled value="#999999"></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>Custom theming (--frcp-* overrides)</h2>
+			<div class="themed">
+				<fr-colorpicker id="c-themed" value="oklch(0.5 0.18 300)"></fr-colorpicker>
+			</div>
+		</section>
+
+		<section>
+			<h2>Dutch labels (label-* overrides)</h2>
+			<fr-colorpicker
+				id="c-dutch"
+				value="oklch(0.6 0.12 140)"
+				label-heading="FR Kleurkiezer"
+				label-close="Sluiten"
+				label-hue="Tint"
+				label-lightness="Helderheid"
+				label-chroma="Verzadiging"
+				label-alpha="Alfa"
+				label-value="Waarde"
+				label-accept="Accepteren"
+			></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>Form participation</h2>
+			<form id="demo-form">
+				<div class="row">
+					<fr-colorpicker id="c-form" name="brand-color" value="oklch(0.62 0.19 30)"></fr-colorpicker>
+					<button type="submit">Submit</button>
+					<button type="reset">Reset</button>
+				</div>
+			</form>
+		</section>
+
+		<section>
+			<h2>Event log</h2>
+			<pre id="log"></pre>
+		</section>
+
+		<script type="module">
+			import "../src/index.ts";
+
+			const log = document.getElementById("log");
+			function append(line) {
+				log.textContent += `${line}\n`;
+				log.scrollTop = log.scrollHeight;
+			}
+
+			for (const picker of document.querySelectorAll("fr-colorpicker")) {
+				picker.addEventListener("input", (event) => {
+					append(`[input]  #${event.target.id} = ${event.target.value}`);
+				});
+				picker.addEventListener("change", (event) => {
+					append(`[change] #${event.target.id} = ${event.target.value}`);
+				});
+			}
+
+			const form = document.getElementById("demo-form");
+			form.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const data = new FormData(form);
+				append(`[submit] FormData: ${JSON.stringify(Object.fromEntries(data))}`);
+			});
+		</script>
+	</body>
+</html>

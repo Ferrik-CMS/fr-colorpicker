@@ -1,0 +1,60 @@
+{
+	"name": "fr-colorpicker",
+	"version": "0.1.0",
+	"description": "A dependency-free OKLCH color-picker Web Component (<fr-colorpicker>).",
+	"type": "module",
+	"license": "MIT",
+	"author": "Fernando van Loenhout",
+	"homepage": "https://github.com/ferrybig/fr-colorpicker#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ferrybig/fr-colorpicker.git"
+	},
+	"bugs": {
+		"url": "https://github.com/ferrybig/fr-colorpicker/issues"
+	},
+	"keywords": [
+		"web-component",
+		"custom-element",
+		"color-picker",
+		"oklch",
+		"color",
+		"form-associated",
+		"shadow-dom"
+	],
+	"main": "./dist/fr-colorpicker.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/fr-colorpicker.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
+	"sideEffects": true,
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc --noEmit && vite build",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"format": "biome check --write",
+		"check-all": "tsc --noEmit && biome check && vitest run",
+		"prepublishOnly": "npm run check-all && npm run build"
+	},
+	"allowScripts": {
+		"fsevents": false
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.7",
+		"jsdom": "^30.0.1",
+		"typescript": "^6.0.3",
+		"vite": "^8.2.1",
+		"vite-plugin-dts": "^5.0.3",
+		"vitest": "^4.1.10"
+	}
+}
