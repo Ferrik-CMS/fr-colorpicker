@@ -15,7 +15,7 @@ export const DEFAULT_LABELS: Labels = {
 	hue: "Hue",
 	lightness: "Lightness",
 	chroma: "Chroma",
-	alpha: "Alpha",
+	alpha: "Opacity",
 	value: "Value",
 	accept: "Accept",
 };

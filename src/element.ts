@@ -7,7 +7,7 @@ import { computeOpenDirection } from "./view/positioning";
 import cssText from "./view/styles.css?inline";
 import { createSwatchButton, type SwatchButton } from "./view/swatchButton";
 
-const DEFAULT_DEFAULT_VALUE = "#f000f0";
+const DEFAULT_DEFAULT_VALUE = "oklch(0.7433 0.1257 316.74)";
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(cssText);
