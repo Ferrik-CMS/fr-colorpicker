@@ -7,7 +7,7 @@ import { computeOpenDirection } from "./view/positioning";
 import cssText from "./view/styles.css?inline";
 import { createSwatchButton, type SwatchButton } from "./view/swatchButton";
 
-const DEFAULT_DEFAULT_VALUE = "oklch(0.5382 0.2 0 / 1)";
+const DEFAULT_DEFAULT_VALUE = "#f000f0";
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(cssText);
@@ -223,7 +223,18 @@ export class FrColorPickerElement extends HTMLElement {
 	}
 
 	#labelAttribute(key: keyof Labels): string {
-		return this.getAttribute(`label-${key}`) || DEFAULT_LABELS[key];
+		const labelAttr = this.getAttribute(`label-${key}`);
+		if (labelAttr !== null) {
+			return labelAttr;
+		}
+		const compoundLabelAttr = this.getAttribute(`label`);
+		if (compoundLabelAttr !== null) {
+			const decodedJson = JSON.parse(compoundLabelAttr) as Partial<Labels>;
+			if (decodedJson[key] !== undefined) {
+				return decodedJson[key];
+			}
+		}
+		return DEFAULT_LABELS[key];
 	}
 	#setLabelAttribute(key: keyof Labels, next: string): void {
 		this.setAttribute(`label-${key}`, next);
@@ -238,7 +249,12 @@ export class FrColorPickerElement extends HTMLElement {
 			return;
 		}
 		const rect = this.#trigger.element.getBoundingClientRect();
-		this.#dispatch({ type: "open", value: this.value, offset: computeOpenDirection(rect) });
+		this.#dispatch({
+			type: "open",
+			value: this.value,
+			colorSpace: this.colorSpace,
+			offset: computeOpenDirection(rect),
+		});
 	}
 
 	/**
@@ -256,7 +272,7 @@ export class FrColorPickerElement extends HTMLElement {
 		this.#state = next;
 
 		if (action.type === "accept" && prev.dialog) {
-			this.#committedValue = formatColor(prev.dialog.currentValue);
+			this.#committedValue = formatColor(prev.dialog.currentValue, this.colorSpace === "srgb" ? "hex" : "oklch");
 			this.#internals.setFormValue(this.value);
 			this.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
 		} else if (action.type === "cancel" && prev.dialog) {

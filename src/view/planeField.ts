@@ -104,8 +104,10 @@ export function createPlaneField(options: PlaneFieldOptions): PlaneField {
 			if (needsRedraw) {
 				redraw();
 			}
+
+			const cmax = targetColorSpace === "srgb" ? CMAX_SRGB : CMAX_P3;
 			marker.style.left = `${clamp(lightness, 0, 1) * 100}%`;
-			marker.style.top = `${clamp(1 - chroma / CMAX_P3, 0, 1) * 100}%`;
+			marker.style.top = `${clamp(1 - chroma / cmax, 0, 1) * 100}%`;
 		},
 		destroy() {
 			observer.disconnect();

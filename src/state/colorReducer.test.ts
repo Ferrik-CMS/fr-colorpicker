@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { oklchGamutInfo, parseColor } from "../color/oklchColor";
+import type { ColorSpace } from "../types";
 import { type ColorPickerState, colorReducer } from "./colorReducer";
 
 const DEFAULT_VALUE = "oklch(0.5382 0.2 0 / 1)";
 
-function openedState(value: string): ColorPickerState {
+function openedState(value: string, colorSpace: ColorSpace = "any"): ColorPickerState {
 	return colorReducer(
 		{ dialog: null, defaultValue: DEFAULT_VALUE },
-		{ type: "open", value, offset: { left: 10, top: 20 } },
+		{ type: "open", value, colorSpace, offset: { left: 10, top: 20 } },
 	);
 }
 
@@ -22,9 +23,14 @@ describe("colorReducer: open", () => {
 
 	it("falls back to defaultValue when value is falsy, and {left:0,top:0} when offset is undefined", () => {
 		const initial: ColorPickerState = { dialog: null, defaultValue: DEFAULT_VALUE };
-		const state = colorReducer(initial, { type: "open", value: undefined, offset: undefined });
+		const state = colorReducer(initial, { type: "open", value: undefined, colorSpace: "any", offset: undefined });
 		expect(state.dialog?.initial).toBe(DEFAULT_VALUE);
 		expect(state.dialog?.openDirection).toEqual({ left: 0, top: 0 });
+	});
+
+	it("captures the colorSpace it was opened with onto the dialog", () => {
+		const state = openedState("oklch(0.5 0.1 200 / 1)", "srgb");
+		expect(state.dialog?.colorSpace).toBe("srgb");
 	});
 });
 
@@ -68,16 +74,29 @@ describe("colorReducer: update", () => {
 		expect(oklchGamutInfo(result).inP3).toBe(true);
 	});
 
-	it('treats colorSpace "any" as the P3 gamut check, not unconstrained: a color that is in-P3-but-out-of-sRGB is left untouched', () => {
+	it('with colorSpace "any", treats it as the P3 gamut check: a color that is in-P3-but-out-of-sRGB is left untouched', () => {
 		const value = "oklch(0.4 0.2 260 / 1)";
 		expect(oklchGamutInfo(parseColor(value)).inSrgb).toBe(false);
 		expect(oklchGamutInfo(parseColor(value)).inP3).toBe(true);
 
-		const opened = openedState(value);
+		const opened = openedState(value, "any");
 		const next = colorReducer(opened, { type: "update", nextValue: {} });
 		// Same reference confirms makeColourInBounds accepted it via the inP3
 		// check alone, without clipping it further toward the sRGB gamut.
 		expect(next).toBe(opened);
+	});
+
+	it('with colorSpace "srgb", genuinely clips an in-P3-but-out-of-sRGB color into the sRGB gamut', () => {
+		const value = "oklch(0.4 0.2 260 / 1)";
+		expect(oklchGamutInfo(parseColor(value)).inSrgb).toBe(false);
+
+		const opened = openedState(value, "srgb");
+		const next = colorReducer(opened, { type: "update", nextValue: {} });
+		expect(next).not.toBe(opened); // a real clip happened, unlike the "any" case above
+		const result = next.dialog?.currentValue;
+		if (!result) throw new Error("expected an open dialog");
+		expect(oklchGamutInfo(result).inSrgb).toBe(true);
+		expect(result.C).toBeLessThan(0.2); // chroma was pulled in, not left at the requested (out-of-gamut) value
 	});
 });
 

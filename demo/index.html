@@ -73,6 +73,19 @@
 		</section>
 
 		<section>
+			<h2>styling</h2>
+			<fr-colorpicker id="c-styling" style="height: 15px;"></fr-colorpicker>
+		</section>
+
+		<section>
+			<h2>styling in flex</h2>
+			<div style="display: flex; align-items: center; gap: 12px;">
+				<fr-colorpicker id="c-styling" style="height: 15px;"></fr-colorpicker>
+				<span>Some text</span>
+			</div>
+		</section>
+
+		<section>
 			<h2>Custom theming (--frcp-* overrides)</h2>
 			<div class="themed">
 				<fr-colorpicker id="c-themed" value="oklch(0.5 0.18 300)"></fr-colorpicker>
@@ -89,7 +102,7 @@
 				label-hue="Tint"
 				label-lightness="Helderheid"
 				label-chroma="Verzadiging"
-				label-alpha="Alfa"
+				label-alpha="Helderheid"
 				label-value="Waarde"
 				label-accept="Accepteren"
 			></fr-colorpicker>

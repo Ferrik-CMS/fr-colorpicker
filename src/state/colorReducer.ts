@@ -106,6 +106,7 @@ export interface DialogState {
 	initial: string;
 	stableValue: OklchState;
 	currentValue: OklchState;
+	colorSpace: ColorSpace;
 }
 
 export interface ColorPickerState {
@@ -114,7 +115,7 @@ export interface ColorPickerState {
 }
 
 export type ColorPickerAction =
-	| { type: "open"; value: string | undefined; offset: OpenDirection | undefined }
+	| { type: "open"; colorSpace: ColorSpace; value: string | undefined; offset: OpenDirection | undefined }
 	| { type: "accept" }
 	| { type: "cancel" }
 	| { type: "update"; nextValue: SetOklchStateAction }
@@ -144,6 +145,7 @@ export function colorReducer(state: ColorPickerState, action: ColorPickerAction)
 					initial: value,
 					stableValue: parsed,
 					currentValue: parsed,
+					colorSpace: action.colorSpace,
 				},
 			};
 		}
@@ -167,11 +169,13 @@ export function colorReducer(state: ColorPickerState, action: ColorPickerAction)
 				a: clamp(resolved.a, 0, 1),
 			};
 			const adjustLightnessInsteadOfChroma = clamped.L === old.L && clamped.C !== old.C;
-			// "any" here is not "unconstrained" - makeColourInBounds treats any
-			// non-"srgb" target as the P3 gamut check. This matches the source
-			// exactly: the public colorSpace prop only affects canvas rendering,
-			// never this internal snap-into-bounds call.
-			const normalized = makeColourInBounds(clamped, "any", adjustLightnessInsteadOfChroma);
+			// "any" is not "unconstrained" - makeColourInBounds treats any
+			// non-"srgb" target as the P3 gamut check. Unlike the original React
+			// source (which always snapped against "any"/P3 regardless of the
+			// public colorSpace prop), this uses the dialog's actual colorSpace,
+			// so color-space="srgb" genuinely constrains interactive edits to the
+			// sRGB gamut, not just which regions the canvases paint as in-bounds.
+			const normalized = makeColourInBounds(clamped, state.dialog.colorSpace, adjustLightnessInsteadOfChroma);
 			if (
 				state.dialog.currentValue.L === normalized.L &&
 				state.dialog.currentValue.C === normalized.C &&

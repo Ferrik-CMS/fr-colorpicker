@@ -11,6 +11,7 @@ export function computeOpenDirection(rect: DOMRect): OpenDirection {
 	if (left + ourWidth > window.innerWidth) {
 		left = window.innerWidth - ourWidth;
 	}
+	left += document.scrollingElement?.scrollLeft ?? 0;
 
 	let top = rect.top - 15;
 	if (top < 0) {
@@ -19,6 +20,7 @@ export function computeOpenDirection(rect: DOMRect): OpenDirection {
 	if (top + ourHeight > window.innerHeight) {
 		top = window.innerHeight - ourHeight;
 	}
+	top += document.scrollingElement?.scrollTop ?? 0
 
 	return { left, top };
 }

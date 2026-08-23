@@ -3,25 +3,28 @@
  * in from global.module.css and Button.module.css. Class names dropped their
  * CSS-module hashing (Shadow DOM already prevents collisions with the host
  * page) and were renamed to kebab-case. `--frsted--*` design tokens became
- * `--frcp-*`, with fallback defaults declared on :host so the component
- * looks right even if the host page never defines them.
+ * `--frcp-*`, with fallback defaults given inline via `var(--frcp-x, ...)`
+ * at each use site (not declared on :host) so the component looks right by
+ * default while still letting a host-page rule on an ancestor (e.g. a
+ * wrapping `.themed` element) override them through normal inheritance.
  */
 
 :host {
 	display: inline-flex;
 	position: relative;
 	align-items: stretch;
+	min-height: 0;
+	min-width: 0;
+	width: 32px;
+	height: 32px;
+	contain: strict;
 	justify-content: stretch;
-	--frcp-border: 1px solid #26232a;
-	--frcp-border-radius: 4px;
-	--frcp-color: #26232a;
-	--frcp-background: white;
 }
 
 /* Shared bordered-field look, ported from global.module.css's `.box`. */
 .field {
-	border: var(--frcp-border);
-	border-radius: var(--frcp-border-radius);
+	border: var(--frcp-border, 1px solid #26232a);
+	border-radius: var(--frcp-border-radius, 4px);
 	padding: 4px 12px;
 	height: 34px;
 	box-sizing: border-box;
@@ -29,8 +32,8 @@
 	font-family: inherit;
 	font-size: inherit;
 	font-weight: inherit;
-	color: var(--frcp-color);
-	background: var(--frcp-background);
+	color: var(--frcp-color, #26232a);
+	background: var(--frcp-background, white);
 }
 
 /*
@@ -46,11 +49,11 @@
 	height: 34px;
 	padding: 0;
 	border: 0;
-	border-radius: var(--frcp-border-radius);
+	border-radius: var(--frcp-border-radius, 4px);
 	appearance: none;
 	cursor: pointer;
 	background: transparent;
-	color: var(--frcp-color);
+	color: var(--frcp-color, #26232a);
 	font-family: inherit;
 	font-size: 17px;
 	display: inline-grid;
@@ -65,8 +68,8 @@
 .swatch {
 	width: 32px;
 	height: 32px;
-	box-sizing: content-box;
-	border: var(--frcp-border);
+	box-sizing: border-box;
+	border: var(--frcp-border, 1px solid #26232a);
 	border-radius: 6px;
 	padding: 0;
 	overflow: hidden;
@@ -79,6 +82,10 @@
 		black;
 	background-size: 10px 10px;
 	background-position: center;
+}
+:host > .swatch {
+	width: 100%;
+	height: 100%;
 }
 
 .swatch-fill {
@@ -93,17 +100,19 @@
 	z-index: 100;
 	width: 316px;
 	padding: 14px;
-	border: var(--frcp-border);
+	border: var(--frcp-border, 1px solid #26232a);
 	border-radius: 12px;
 	background: #fff;
 	box-shadow: 0 10px 30px #00000024;
-	display: flex;
+	display: grid;
+	grid-template-columns: auto 1fr auto;
 	flex-direction: column;
 	gap: 10px;
 	margin: 0;
 }
 
 .head {
+	grid-column: 1 / -1;
 	display: flex;
 	align-items: center;
 }
@@ -116,9 +125,10 @@
 }
 
 .plane {
+	grid-column: 1 / -1;
 	position: relative;
 	height: 200px;
-	border: var(--frcp-border);
+	border: var(--frcp-border, 1px solid #26232a);
 	border-radius: 8px;
 	overflow: hidden;
 	background: conic-gradient(
@@ -130,12 +140,6 @@
 	background-size: 10px 10px;
 	cursor: crosshair;
 	touch-action: none;
-}
-
-/* Dead in the source too (aria-disabled is never actually set) -- kept for parity, see planeField.ts. */
-.plane[aria-disabled="true"] {
-	cursor: not-allowed;
-	opacity: 0.6;
 }
 
 .plane-canvas {
@@ -160,27 +164,28 @@
 }
 
 .row {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	display: contents;
 }
 .row[hidden] {
 	display: none;
 }
 
 .row-label {
-	width: 64px;
 	font-size: 12px;
 	font-weight: 700;
 	color: #6b6770;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	align-self: center;
 }
 
 .value-row {
 	border-top: 1px dashed #d6d1da;
 	padding-top: 10px;
+}
+.value-row .icon-btn {
+	justify-self: flex-end;
 }
 
 .row-input {

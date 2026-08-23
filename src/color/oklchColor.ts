@@ -19,12 +19,10 @@ export interface GamutInfo {
 	p3: EncodedTriplet;
 	inSrgb: boolean;
 	inP3: boolean;
-	// nearSrgb: boolean;
-	// nearP3: boolean;
 }
 
 export const CMAX_P3 = 0.4;
-export const CMAX_SRGB = 0.3;
+export const CMAX_SRGB = 0.31;
 export const CMAX_REC2020 = 0.5;
 
 export function clamp(value: number, min: number, max: number): number {
