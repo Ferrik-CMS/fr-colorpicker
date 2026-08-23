@@ -36,9 +36,10 @@ export function createPlaneField(options: PlaneFieldOptions): PlaneField {
 	marker.className = "plane-marker";
 	plane.appendChild(marker);
 
-	let currentHue = 0;
+	let currentHue = -1;
 	let currentLightness = 0;
 	let currentChroma = 0;
+	let redrawTask = 0;
 	let currentColorSpace: ColorSpace = "any";
 
 	function pick(clientX: number, clientY: number) {
@@ -84,6 +85,7 @@ export function createPlaneField(options: PlaneFieldOptions): PlaneField {
 	});
 
 	function redraw() {
+		redrawTask = 0;
 		drawPlaneCanvas(canvas, currentColorSpace, currentHue);
 	}
 
@@ -96,13 +98,16 @@ export function createPlaneField(options: PlaneFieldOptions): PlaneField {
 			// The plane's gradient bitmap only depends on hue + targetColorSpace,
 			// not lightness/chroma (which only move the marker) -- matches the
 			// source's `useEffect(..., [hue, targetColorSpace])` dependency list.
+			const forceRedraw = currentHue === -1;
 			const needsRedraw = hue !== currentHue || targetColorSpace !== currentColorSpace;
 			currentHue = hue;
 			currentLightness = lightness;
 			currentChroma = chroma;
 			currentColorSpace = targetColorSpace;
-			if (needsRedraw) {
+			if (forceRedraw && !redrawTask) {
 				redraw();
+			} else if (needsRedraw && !redrawTask) {
+				redrawTask = requestAnimationFrame(redraw);
 			}
 
 			const cmax = targetColorSpace === "srgb" ? CMAX_SRGB : CMAX_P3;
