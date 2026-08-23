@@ -1,5 +1,5 @@
 import assertNever from "../color/assertNever";
-import { CMAX_P3, CMAX_SRGB, cssOfDisplayP3, type OklchState, oklchGamutInfo, roundByte } from "../color/oklchColor";
+import { CMAX_P3, CMAX_SRGB, type OklchState, oklchGamutInfo, roundByte } from "../color/oklchColor";
 import type { ColorSpace } from "../types";
 
 export const SLIDER_CANVAS_DEFAULT_WIDTH = 220;
@@ -45,27 +45,55 @@ export function drawSliderCanvas(
 		return;
 	}
 	const { ctx, width, height } = resized;
-
-	ctx.clearRect(0, 0, width, height);
 	const topHeight = Math.floor(height / 2);
 	const bottomY = topHeight;
 	const bottomHeight = height - topHeight;
+
+	const image = ctx.createImageData(width, height);
+	const data = image.data;
+	let key: "srgb" | "p3";
+	const imageColorSpace = image.colorSpace ?? "srgb";
+	switch (imageColorSpace) {
+		case "srgb":
+			key = "srgb" as const;
+			break;
+		case "display-p3":
+			key = "p3" as const;
+			break;
+		default:
+			return assertNever(imageColorSpace);
+	}
 
 	for (let x = 0; x < width; x += 1) {
 		const t = width <= 1 ? 0 : x / (width - 1);
 		const state = renderAt(t);
 		const gamut = oklchGamutInfo(state);
+		const triplet = gamut[key];
+		const alpha = roundByte(state.a);
 
 		if (gamut.inSrgb || showOutOfBounds) {
-			ctx.fillStyle = `rgba(${roundByte(gamut.srgb.r)} ${roundByte(gamut.srgb.g)} ${roundByte(gamut.srgb.b)} / ${state.a.toFixed(3)})`;
-			ctx.fillRect(x, 0, 1, topHeight);
+			for (let y = 0; y < topHeight; y += 1) {
+				const i = (y * width + x) * 4;
+				data[i] = roundByte(triplet.r);
+				data[i + 1] = roundByte(triplet.g);
+				data[i + 2] = roundByte(triplet.b);
+				data[i + 3] = alpha;
+			}
 		}
 
 		if ((colorSpace === "srgb" ? gamut.inSrgb : gamut.inP3) || showOutOfBounds) {
-			ctx.fillStyle = cssOfDisplayP3(state);
-			ctx.fillRect(x, bottomY, 1, bottomHeight);
+			for (let y = bottomY; y < bottomY + bottomHeight; y += 1) {
+				const i = (y * width + x) * 4;
+				data[i] = roundByte(triplet.r);
+				data[i + 1] = roundByte(triplet.g);
+				data[i + 2] = roundByte(triplet.b);
+				data[i + 3] = alpha;
+			}
 		}
 	}
+
+	ctx.clearRect(0, 0, width, height);
+	ctx.putImageData(image, 0, 0);
 
 	ctx.fillStyle = "#00000022";
 	ctx.fillRect(0, topHeight - 0.5, width, 1);
