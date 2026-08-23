@@ -27,7 +27,7 @@ el.addEventListener("input", (e) => console.log("live:", e.target.value));
 el.addEventListener("change", (e) => console.log("committed:", e.target.value));
 ```
 
-See [`demo/index.html`](demo/index.html) for a fuller working example (theming, localization, form participation).
+See [`index.html`](index.html) for a fuller working example (theming, localization, form participation).
 
 ## Self-hosting the built files
 
@@ -94,7 +94,7 @@ A few differences worth accounting for when migrating:
 | `label-value`     | `.labelValue`     | string                                            | `"Value"`                   | Label for the raw text-value field.                                                                                      |
 | `label-accept`    | `.labelAccept`    | string                                            | `"Accept"`                  | Accept button's accessible name.                                                                                         |
 
-Only English strings ship by default; pass `label-*` attributes to localize (see the Dutch example in `demo/index.html`).
+Only English strings ship by default; pass `label-*` attributes to localize (see the Dutch example in `index.html`).
 
 ## Events
 
@@ -124,7 +124,7 @@ fr-colorpicker {
 
 ## Development
 
-- `npm run dev` — Vite dev server; open `/demo/` for the manual test harness.
+- `npm run dev` — Vite dev server; open `/` for the manual test harness.
 - `npm test` / `npm run test:watch` — Vitest.
 - `npm run check-all` — typecheck + lint + test.
 - `npm run build` — outputs `dist/fr-colorpicker.js` (ESM) + type declarations.
