@@ -20,7 +20,7 @@ describe("computeOpenDirection", () => {
 	it("offsets 15px up-and-left from the trigger rect when there's room", () => {
 		Object.defineProperty(window, "innerWidth", { value: 2000, configurable: true });
 		Object.defineProperty(window, "innerHeight", { value: 2000, configurable: true });
-		expect(computeOpenDirection(rect(100, 200))).toEqual({ left: 85, top: 185 });
+		expect(computeOpenDirection(rect(100, 200))).toEqual({ left: 85, top: 184 });
 	});
 
 	it("clamps left/top to 0 when the offset would go negative", () => {

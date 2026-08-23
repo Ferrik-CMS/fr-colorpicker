@@ -94,7 +94,7 @@
 	height: 100%;
 }
 
-.popover:open {
+.popover:open, .popover:popover-open {
 	position: absolute;
 	left: 0;
 	z-index: 100;

@@ -13,7 +13,7 @@ export function computeOpenDirection(rect: DOMRect): OpenDirection {
 	}
 	left += document.scrollingElement?.scrollLeft ?? 0;
 
-	let top = rect.top - 15;
+	let top = rect.top - 16;
 	if (top < 0) {
 		top = 0;
 	}

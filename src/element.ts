@@ -72,7 +72,7 @@ export class FrColorPickerElement extends HTMLElement {
 		this.#state = { ...this.#state, defaultValue: this.defaultValue };
 		this.#popover.setLabels(resolveLabels(this));
 		this.#internals.setFormValue(this.value);
-		this.#render();
+		this.#render(false);
 	}
 
 	disconnectedCallback(): void {
@@ -84,25 +84,25 @@ export class FrColorPickerElement extends HTMLElement {
 			case "value":
 				this.#applyValueAttribute();
 				this.#internals.setFormValue(this.value);
-				this.#render();
+				this.#render(false);
 				break;
 			case "default-value":
 				this.#state = { ...this.#state, defaultValue: this.defaultValue };
 				this.#applyValueAttribute();
 				this.#internals.setFormValue(this.value);
-				this.#render();
+				this.#render(false);
 				break;
 			case "disabled": {
 				const isDisabled = this.disabled;
 				if (isDisabled && this.#state.dialog) {
 					this.#dispatch({ type: "cancel" });
 				}
-				this.#render();
+				this.#render(false);
 				break;
 			}
 			case "no-alpha":
 			case "color-space":
-				this.#render();
+				this.#render(false);
 				break;
 			case "name":
 				// No extra handling needed: form submission reads the `name`
@@ -120,7 +120,7 @@ export class FrColorPickerElement extends HTMLElement {
 		this.#committedValue = this.defaultValue;
 		this.#popover.close();
 		this.#internals.setFormValue(this.value);
-		this.#render();
+		this.#render(false);
 	}
 
 	formDisabledCallback(disabled: boolean): void {
@@ -136,7 +136,7 @@ export class FrColorPickerElement extends HTMLElement {
 	set value(next: string) {
 		this.#committedValue = next;
 		this.#internals.setFormValue(this.value);
-		this.#render();
+		this.#render(false);
 	}
 
 	get defaultValue(): string {
@@ -273,6 +273,7 @@ export class FrColorPickerElement extends HTMLElement {
 		}
 		this.#state = next;
 
+		let open = false;
 		if (action.type === "accept" && prev.dialog) {
 			this.#committedValue = formatColor(prev.dialog.currentValue, this.colorSpace === "srgb" ? "hex" : "oklch");
 			this.#internals.setFormValue(this.value);
@@ -284,25 +285,30 @@ export class FrColorPickerElement extends HTMLElement {
 		} else if (action.type === "update" && next.dialog) {
 			this.#internals.setFormValue(this.value);
 			this.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+		} else if (action.type === "open" && next.dialog) {
+			open = true;
 		}
 
-		this.#render();
+		this.#render(open);
 	}
 
-	#render(): void {
+	#render(open: boolean): void {
 		const displayValue = this.value;
 		const preview = `linear-gradient(oklch(from ${displayValue} l c h/100%) 50%, ${displayValue} 50%)`;
 		this.#trigger.setPreview(preview);
 		this.#trigger.setDisabled(this.disabled);
 
 		if (this.#state.dialog) {
-			this.#popover.open(this.#state.dialog.openDirection);
+			if (open) {
+				this.#popover.open(this.#state.dialog.openDirection);
+			}
 			this.#popover.update({
 				currentValue: this.#state.dialog.currentValue,
 				colorSpace: this.colorSpace,
 				noAlpha: this.noAlpha,
 				preview,
 			});
+
 		} else {
 			this.#popover.close();
 		}

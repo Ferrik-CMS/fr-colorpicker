@@ -58,8 +58,15 @@ export interface Popover {
 export function createPopover(callbacks: PopoverCallbacks): Popover {
 	const { onChange, onCommit, onAccept, onCancel, onValueInput } = callbacks;
 
+	let lastKeyPressed = "";
+	let onKeyPressRegistered = false;
+	const onKeyPress = (event: KeyboardEvent) => {
+		lastKeyPressed = event.key;
+	}
+
 	const dialog = document.createElement("dialog");
 	dialog.className = "popover";
+	dialog.popover = "auto";
 
 	const form = document.createElement("form");
 	form.className = "form";
@@ -131,6 +138,15 @@ export function createPopover(callbacks: PopoverCallbacks): Popover {
 	dialog.addEventListener("close", () => {
 		onCancel();
 	});
+	dialog.addEventListener("toggle", (e) => {
+		if (e.newState === "closed") {
+			if (lastKeyPressed === "Escape") {
+				onCancel();
+			} else {
+				onAccept();
+			}
+		}
+	});
 	closeButton.addEventListener("click", (event) => {
 		event.preventDefault();
 		onCancel();
@@ -146,15 +162,24 @@ export function createPopover(callbacks: PopoverCallbacks): Popover {
 			// (compensating for the persistent, non-remounted DOM) should only
 			// fire once, on the actual closed->open transition.
 			if (!dialog.open) {
-				dialog.showModal();
-				valueRow.resetBuffer();
+				// dialog.showModal();
+				dialog.togglePopover({
+					force: true,
+				});
 				valueRow.focusAndSelect();
+				if (!onKeyPressRegistered) {
+					document.addEventListener("keydown", onKeyPress);
+					onKeyPressRegistered = true;
+				}
 			}
 		},
 		close() {
 			if (dialog.open) {
 				dialog.close();
 			}
+			dialog.togglePopover({
+				force: false,
+			});
 		},
 		update(data: PopoverUpdateData) {
 			const { currentValue, colorSpace, noAlpha, preview } = data;
@@ -183,6 +208,10 @@ export function createPopover(callbacks: PopoverCallbacks): Popover {
 			plane.destroy();
 			for (const slider of sliders) {
 				slider.destroy();
+			}
+			if (onKeyPressRegistered) {
+				document.removeEventListener("keydown", onKeyPress);
+				onKeyPressRegistered = false;
 			}
 		},
 	};
