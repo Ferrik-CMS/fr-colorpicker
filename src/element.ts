@@ -129,7 +129,9 @@ export class FrColorPickerElement extends HTMLElement {
 
 	/** The live formatted color while the dialog is open, otherwise the last committed value. */
 	get value(): string {
-		return this.#state.dialog ? formatColor(this.#state.dialog.currentValue) : this.#committedValue;
+		return this.#state.dialog
+			? formatColor(this.#state.dialog.currentValue, this.colorSpace === "srgb" ? "hex" : "oklch")
+			: this.#committedValue;
 	}
 	set value(next: string) {
 		this.#committedValue = next;
