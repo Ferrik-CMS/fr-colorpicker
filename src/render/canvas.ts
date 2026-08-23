@@ -1,5 +1,5 @@
 import assertNever from "../color/assertNever";
-import { CMAX_P3, CMAX_SRGB, type OklchState, oklchGamutInfo, roundByte } from "../color/oklchColor";
+import { CMAX_P3, CMAX_SRGB, cssOfDisplayP3, type OklchState, oklchGamutInfo, roundByte } from "../color/oklchColor";
 import type { ColorSpace } from "../types";
 
 export const SLIDER_CANVAS_DEFAULT_WIDTH = 220;

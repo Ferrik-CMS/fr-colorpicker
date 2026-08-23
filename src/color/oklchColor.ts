@@ -76,18 +76,42 @@ function isInGamutLinear(linear: [number, number, number], lightness: number, ep
 	return linear.every((v) => v >= lowerBound && v <= 1 + epsilon);
 }
 
+/**
+ * Callers typically only need one or two of the four fields below (e.g.
+ * `colorReducer`'s hot gamut-snapping loop only ever reads a single boolean),
+ * so each field is computed lazily on first access rather than eagerly -- the
+ * costly `linearToEncoded` conversions in particular are skipped entirely
+ * when nothing reads `.srgb`/`.p3`. The two linear-space conversions are
+ * still cached so `.inSrgb`/`.srgb` (and `.inP3`/`.p3`) share one `applyMat3`
+ * call each.
+ */
 export function oklchGamutInfo(state: OklchState, lossy: boolean = false): GamutInfo {
 	const lms = oklchToLrgb(state.L, state.C, state.H);
-	const srgbLinear = applyMat3(LMS_TO_LINEAR_SRGB, lms);
-	const p3Linear = applyMat3(LMS_TO_LINEAR_P3, lms);
-
 	const epsilon = lossy ? GAMUT_EPSILON_LOSSY : GAMUT_EPSILON;
 
+	let srgbLinear: [number, number, number] | undefined;
+	const getSrgbLinear = () => (srgbLinear ??= applyMat3(LMS_TO_LINEAR_SRGB, lms));
+	let p3Linear: [number, number, number] | undefined;
+	const getP3Linear = () => (p3Linear ??= applyMat3(LMS_TO_LINEAR_P3, lms));
+
+	let srgbEncoded: EncodedTriplet | undefined;
+	let p3Encoded: EncodedTriplet | undefined;
+
 	return {
-		srgb: linearToEncoded(srgbLinear),
-		p3: linearToEncoded(p3Linear),
-		inSrgb: isInGamutLinear(srgbLinear, state.L, epsilon),
-		inP3: isInGamutLinear(p3Linear, state.L, epsilon),
+		get srgb() {
+			srgbEncoded ??= linearToEncoded(getSrgbLinear());
+			return srgbEncoded;
+		},
+		get p3() {
+			p3Encoded ??= linearToEncoded(getP3Linear());
+			return p3Encoded;
+		},
+		get inSrgb() {
+			return isInGamutLinear(getSrgbLinear(), state.L, epsilon);
+		},
+		get inP3() {
+			return isInGamutLinear(getP3Linear(), state.L, epsilon);
+		},
 	};
 }
 
