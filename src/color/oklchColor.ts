@@ -22,7 +22,7 @@ export interface GamutInfo {
 }
 
 export const CMAX_P3 = 0.4;
-export const CMAX_SRGB = 0.31;
+export const CMAX_SRGB = 0.315; // The maximum chroma of sRGB is 0.313 for #0000ff
 export const CMAX_REC2020 = 0.5;
 
 export function clamp(value: number, min: number, max: number): number {
