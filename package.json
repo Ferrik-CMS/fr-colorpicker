@@ -5,13 +5,13 @@
 	"type": "module",
 	"license": "MIT",
 	"author": "Fernando van Loenhout",
-	"homepage": "https://github.com/ferrybig/fr-colorpicker#readme",
+	"homepage": "https://github.com/Ferrik-CMS/fr-colorpicker#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ferrybig/fr-colorpicker.git"
+		"url": "git+https://github.com/Ferrik-CMS/fr-colorpicker.git"
 	},
 	"bugs": {
-		"url": "https://github.com/ferrybig/fr-colorpicker/issues"
+		"url": "https://github.com/Ferrik-CMS/fr-colorpicker/issues"
 	},
 	"keywords": [
 		"web-component",
