@@ -112,8 +112,8 @@ The component renders in a Shadow DOM with sensible built-in defaults, so it loo
 
 ```css
 fr-colorpicker {
- --frcp-border: 2px solid #7c3aed;
- --frcp-border-radius: 10px;
+ --frcp-border: 1px solid #26232a;
+ --frcp-border-radius: 4px;
  --frcp-color: #4c1d95;
  --frcp-background: #f5f3ff;
 }
